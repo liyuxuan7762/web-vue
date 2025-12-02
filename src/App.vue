@@ -1,22 +1,42 @@
 <template>
-  <!-- 发布订阅 -->
-  <div class="pub-sub">
-    <BasePub />
-    <BaseSub />
-    <BaseSub />
+  <div>
+    <h1>我是父组件</h1>
+    <h1>{{ person.name }}</h1>
+    <h1>{{ person.age }}</h1>
+    <BaseSon />
   </div>
 </template>
 
 <script>
-import BasePub from "./components/BasePub.vue";
-import BaseSub from "./components/BaseSub.vue";
+
+import BaseSon from "./components/BaseSon.vue";
+
 export default {
-  components: {
-    BasePub,
-    BaseSub,
+  provide() {
+    return {
+      msg: this.msg,
+      person: this.person
+    }
   },
-};
+  components: {
+    BaseSon,
+  },
+
+  data() {
+    return {
+      msg: "我是父组件的消息",
+      person: {
+        name: "张三",
+        age: 18,
+      }
+    }
+  }
+}
 </script>
 
-<style>
+<style scoped>
+div {
+  border: 1px solid red;
+  margin: 10px;
+}
 </style>
