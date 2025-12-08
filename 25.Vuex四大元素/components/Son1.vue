@@ -7,18 +7,6 @@
 
     <hr />
     <p>过滤后的列表：{{ filteredList }}</p>
-
-    <p>{{ $store.state.user.name }}</p>
-    <p>用户名字：{{ username }}</p>
-    <p>用户大写名字：{{ UpperName }}</p>
-
-    <button @click="handleSetUserInfo({ name: 'ls', age: 20 })">
-      修改名字
-    </button>
-
-    <button @click="handleSetUserInfoDelay({ name: 'zl', age: 210 })">
-      一秒钟后修改名字
-    </button>
   </div>
 </template>
 
@@ -32,13 +20,6 @@ export default {
     handleDelayClick(payload) {
       this.$store.dispatch("delayAddCount", payload);
     },
-    handleSetUserInfo(payload) {
-      this.$store.commit("user/setUserInfo", payload);
-    },
-    handleSetUserInfoDelay(payload) {
-      console.log(payload);
-      this.$store.dispatch("user/updateDelay", payload);
-    },
   },
   computed: {
     count() {
@@ -49,12 +30,6 @@ export default {
     },
     filteredList() {
       return this.$store.getters.filterdList;
-    },
-    username() {
-      return this.$store.state.user.name;
-    },
-    UpperName() {
-      return this.$store.getters["user/UpperName"];
     },
   },
 };

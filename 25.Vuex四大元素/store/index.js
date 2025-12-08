@@ -8,7 +8,6 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
-import user from './modules/user'
 
 Vue.use(Vuex)
 
@@ -45,9 +44,6 @@ const store = new Vuex.Store({
     filterdList(state) {
       return state.list.filter(item => item > 5)
     }
-  },
-  modules: {
-    user,
   }
 })
 export default store

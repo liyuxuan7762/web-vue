@@ -18,10 +18,6 @@
     <div>
       <p>过滤后的列表：{{ filterdList }}</p>
     </div>
-
-    <p>名字： {{ name }}</p>
-
-    <button @click="setUserInfo({ name: 'ww', age: 20 })">修改名字</button>
   </div>
 </template>
 
@@ -31,18 +27,11 @@ export default {
   name: "BaseSon2",
   computed: {
     ...mapState(["count", "title"]),
-
-    ...mapState("user", ["name"]),
-
-    ...mapGetters("user", ["UpperName"]),
-
     ...mapGetters(["filterdList"]),
   },
   methods: {
     ...mapMutations(["subCount"]),
     ...mapActions(["delayAddCount"]),
-    ...mapMutations("user", ["setUserInfo"]),
-    ...mapActions("user", ["updateDelay"]),
   },
 };
 </script>
