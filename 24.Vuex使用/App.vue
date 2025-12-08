@@ -2,7 +2,7 @@
   <div>
     <h2>我是父组件 --> {{ title }}</h2>
     <p>父组件的内容 {{ count }}</p>
-    <input type="text" placeholder="请输入内容" :value="title" @input="handleInput" />
+    <input type="text" placeholder="请输入内容" :value="title" />
     <Son1 />
     <Son2 />
   </div>
