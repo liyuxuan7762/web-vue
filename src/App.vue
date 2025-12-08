@@ -1,13 +1,22 @@
 <template>
-  <div class="h5-wrapper">
-    <router-view></router-view>
+  <div id="apa">
+    <BankCard
+      name="Gega Smith"
+      role="OverBridge Expert"
+      card-number="4756999988889018"
+      balance="3.469.52"
+    />
   </div>
 </template>
 
 <script>
+import BankCard from "@/components/BankCard.vue";
 export default {
   name: "h5-wrapper",
-}
+  components: {
+    BankCard,
+  },
+};
 </script>
 
 <style>
