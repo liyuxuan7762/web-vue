@@ -8,46 +8,21 @@
  */
 import Vue from 'vue'
 import Vuex from 'vuex'
-import user from './modules/user'
+
 
 Vue.use(Vuex)
 
 const store = new Vuex.Store({
   strict: true,
   state: {
-    count: 0,
-    title: 'Hello from Vuex',
-    list: [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
   },
   mutations: {
-    addCount(state, payload) {
-      state.count += payload
-    },
-    changeTitle(state, payload) {
-      state.title = payload
-    },
-    subCount(state, payload) {
-      state.count -= payload
-    },
-    setCount(state, payload) {
-      state.count = payload
-    }
   },
   actions: {
-    delayAddCount(context, payload) {
-      setTimeout(() => {
-        context.commit('setCount', payload)
-      }, 1000
-      );
-    }
   },
   getters: {
-    filterdList(state) {
-      return state.list.filter(item => item > 5)
-    }
   },
   modules: {
-    user,
   }
 })
 export default store
