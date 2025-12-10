@@ -27,3 +27,23 @@ export const getSmsCode = (mobile, imgCode, imgKey) => {
 		}
 	})
 }
+
+// 用户登录
+// 需要传递短信验证码，手机号码，是否是第三方登录，以及第三方登录数据
+export const login = (smsCode, mobile, isParty = false, partyData = {}) => {
+	return request({
+		url: '/passport/login',
+		method: 'post',
+		headers: {
+			platform: 'h5'
+		},
+		data: {
+			form: {
+				smsCode,
+				mobile,
+				isParty,
+				partyData,
+			}
+		}
+	})
+}

@@ -12,7 +12,7 @@
  * @Date         : 2025-12-09 20:01:20
  * @Description  : 全局注册vant组件
 */
-import { Toast, Button, Tabbar, TabbarItem, NavBar } from 'vant';
+import { GridItem, Search, Swipe, SwipeItem, Grid, Toast, Button, Tabbar, TabbarItem, NavBar } from 'vant';
 import Vue from 'vue';
 
 Vue.use(Toast);
@@ -20,3 +20,8 @@ Vue.use(NavBar);
 Vue.use(Tabbar);
 Vue.use(TabbarItem);
 Vue.use(Button);
+Vue.use(GridItem)
+Vue.use(Search)
+Vue.use(Swipe)
+Vue.use(SwipeItem)
+Vue.use(Grid)

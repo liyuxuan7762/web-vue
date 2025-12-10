@@ -9,47 +9,72 @@
 
       <div class="form">
         <div class="form-item">
-          <input v-model="mobile" class="inp" maxlength="11" placeholder="请输入手机号码" type="text" />
+          <input
+            v-model="mobile"
+            class="inp"
+            maxlength="11"
+            placeholder="请输入手机号码"
+            type="text"
+          />
         </div>
         <div class="form-item">
-          <input v-model="imgCode" class="inp" maxlength="5" placeholder="请输入图形验证码" type="text" />
+          <input
+            v-model="imgCode"
+            class="inp"
+            maxlength="5"
+            placeholder="请输入图形验证码"
+            type="text"
+          />
           <img v-if="imgUrl" :src="imgUrl" alt="" @click="getImgCode" />
         </div>
         <div class="form-item">
-          <input  v-model="smsCode" class="inp" placeholder="请输入短信验证码" type="text" />
+          <input
+            v-model="smsCode"
+            class="inp"
+            placeholder="请输入短信验证码"
+            type="text"
+          />
           <button ref="smsCodeBtn" @click="getSmsCode">获取验证码</button>
         </div>
       </div>
 
-      <div class="login-btn">登录</div>
+      <div class="login-btn" @click="login">登录</div>
     </div>
   </div>
 </template>
 
 <script>
-import { getCaptcha, getSmsCode } from "@/api/login";
-import { Toast } from 'vant';
+import { getCaptcha, getSmsCode, login } from "@/api/login";
+import { Toast } from "vant";
+import { verifyPhone, verifyImgCode, verifySmsCode } from "@/utils/utils";
+import { mapMutations } from "vuex";
+
 export default {
   name: "LoginPage",
   data() {
     return {
       imgUrl: "", // 图像Base64编码
-      codeKey: "",  // 图像回传的key，暂时没有什么用
-      mobile: "", // 手机号
-      imgCode: "",  // 图像验证码
-      smsCode: "",  // 短信验证码
-    }
+      codeKey: "", // 图像回传的key，暂时没有什么用
+      mobile: "13156766378", // 手机号
+      imgCode: "", // 图像验证码
+      smsCode: "246810", // 短信验证码
+    };
   },
   created() {
-    this.getImgCode()
+    this.getImgCode();
   },
   methods: {
-    async getImgCode() {
-      const res = await getCaptcha()
+    ...mapMutations("user", ["setUserInfo"]),
 
-      const { data: { base64, key } } = res
-      this.imgUrl = base64
-      this.codeKey = key
+    // 获取图像验证码
+    async getImgCode() {
+      const res = await getCaptcha();
+
+      const {
+        data: { base64, key },
+      } = res;
+      this.imgUrl = base64;
+      this.codeKey = key;
       // Toast({
       //   message: '获取图片验证码成功',
       //   duration: 1000,
@@ -59,55 +84,65 @@ export default {
       //   duration: 1000,
       // })
     },
+
+    // 获取短信验证码
     async getSmsCode() {
-      if (!this.mobile) {
-        Toast({
-          message: '请输入手机号',
-          duration: 1000,
-        })
-        return
+      // 验证手机号是否合法
+      if (!verifyPhone(this.mobile)) {
+        return;
       }
 
-      // 使用正则表达式验证手机号
-      const phoneRegex = /^1[3456789]\d{9}$/
-      if (!phoneRegex.test(this.mobile)) {
-        console.log(this.mobile)
-        Toast({
-          message: '手机号码不正确',
-          duration: 1000,
-        })
-        return
+      // 验证图像验证码是否合法
+      if (!verifyImgCode(this.imgCode)) {
+        return;
       }
 
-      if (!this.imgCode) {
-        Toast({
-          message: '请输入图像验证码',
-          duration: 1000,
-        })
-        return
-      }
-
-      await getSmsCode(this.mobile, this.imgCode, this.codeKey)
+      await getSmsCode(this.mobile, this.imgCode, this.codeKey);
       Toast({
-        message: '获取短信验证码成功',
+        message: "获取短信验证码成功",
         duration: 1000,
-      })
+      });
 
-      let count = 5
-      this.$refs.smsCodeBtn.innerHTML = `${count}秒后重新获取`
+      let count = 5;
+      this.$refs.smsCodeBtn.innerHTML = `${count}秒后重新获取`;
       const timer = setInterval(() => {
-        count--
-        this.$refs.smsCodeBtn.innerHTML = `${count}秒后重新获取`
-        this.$refs.smsCodeBtn.disabled = true
+        count--;
+        this.$refs.smsCodeBtn.innerHTML = `${count}秒后重新获取`;
+        this.$refs.smsCodeBtn.disabled = true;
         if (count <= 0) {
-          this.$refs.smsCodeBtn.innerHTML = '获取验证码'
-          this.$refs.smsCodeBtn.disabled = false
-          clearInterval(timer)
+          this.$refs.smsCodeBtn.innerHTML = "获取验证码";
+          this.$refs.smsCodeBtn.disabled = false;
+          clearInterval(timer);
         }
-      }, 1000)
+      }, 1000);
+    },
 
+    // 用户登录
+    async login() {
+      // 验证手机号是否合法
+      if (!verifyPhone(this.mobile)) {
+        return;
+      }
 
-    }
+      // 验证短信验证码是否合法
+      if (!verifySmsCode(this.smsCode)) {
+        return;
+      }
+
+      const {
+        data: { userId, token },
+      } = await login(this.smsCode, this.mobile);
+
+      Toast({
+        message: "登录成功",
+        duration: 1000,
+      });
+
+      this.$router.push("/home");
+
+      // 登录成功后，保存用户信息
+      this.setUserInfo({ userId, token });
+    },
   },
 };
 </script>

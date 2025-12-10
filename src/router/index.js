@@ -19,7 +19,7 @@ import Category from '@/views/layout/category.vue'
 import Cart from '@/views/layout/cart.vue'
 import User from '@/views/layout/user.vue'
 
-
+import store from '@/store'
 
 Vue.use(VueRouter)
 
@@ -74,6 +74,31 @@ const router = new VueRouter({
       component: MyOrder
     }
   ]
+})
+
+const authUrls = ['/pay', '/myorder']
+
+router.beforeEach((to, from, next) => {
+  // 检查URL是否需要登录才能访问
+  if (!authUrls.includes(to.path)) {
+    // 不需要鉴权，直接放行
+    console.log(to.path)
+    next()
+    return
+  } else {
+    // 需要鉴权，判断是否登录
+    console.log(store.state.user.userInfo.token)
+    if (store.state.user.userInfo.token) {
+      next()
+      return
+    } else {
+      // 未登录，重定向到登录页
+      next({ path: '/login' })
+      return
+    }
+  }
+
+
 })
 
 export default router
