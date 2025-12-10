@@ -1,9 +1,3 @@
-<!--
- * @Author       : Wang Chong(3436971707qq.com)
- * @Version      : V1.0
- * @Date         : 2025-12-09 20:24:20
- * @Description  : 
--->
 <template>
   <div class="login">
     <van-nav-bar title="会员登录" left-arrow @click-left="$router.go(-1)" />
@@ -15,25 +9,15 @@
 
       <div class="form">
         <div class="form-item">
-          <input
-            class="inp"
-            maxlength="11"
-            placeholder="请输入手机号码"
-            type="text"
-          />
+          <input v-model="mobile" class="inp" maxlength="11" placeholder="请输入手机号码" type="text" />
         </div>
         <div class="form-item">
-          <input
-            class="inp"
-            maxlength="5"
-            placeholder="请输入图形验证码"
-            type="text"
-          />
-          <img src="@/assets/code.png" alt="" />
+          <input v-model="imgCode" class="inp" maxlength="5" placeholder="请输入图形验证码" type="text" />
+          <img v-if="imgUrl" :src="imgUrl" alt="" @click="getImgCode" />
         </div>
         <div class="form-item">
-          <input class="inp" placeholder="请输入短信验证码" type="text" />
-          <button>获取验证码</button>
+          <input  v-model="smsCode" class="inp" placeholder="请输入短信验证码" type="text" />
+          <button ref="smsCodeBtn" @click="getSmsCode">获取验证码</button>
         </div>
       </div>
 
@@ -43,24 +27,87 @@
 </template>
 
 <script>
-import request from "@/utils/request";
+import { getCaptcha, getSmsCode } from "@/api/login";
+import { Toast } from 'vant';
 export default {
   name: "LoginPage",
+  data() {
+    return {
+      imgUrl: "", // 图像Base64编码
+      codeKey: "",  // 图像回传的key，暂时没有什么用
+      mobile: "", // 手机号
+      imgCode: "",  // 图像验证码
+      smsCode: "",  // 短信验证码
+    }
+  },
   created() {
-    request({
-      url: "/captcha/image", // ⭐ 这里填写完整的后端路由路径 ⭐
-      method: "get",
-      headers: {
-        platform: "h5",
-      },
-    })
-      .then((res) => {
-        console.log("验证码请求成功:", res);
-        // 在这里处理返回的图片数据
+    this.getImgCode()
+  },
+  methods: {
+    async getImgCode() {
+      const res = await getCaptcha()
+
+      const { data: { base64, key } } = res
+      this.imgUrl = base64
+      this.codeKey = key
+      // Toast({
+      //   message: '获取图片验证码成功',
+      //   duration: 1000,
+      // })
+      // this.$toast({
+      //   message: '获取图片验证码成功',
+      //   duration: 1000,
+      // })
+    },
+    async getSmsCode() {
+      if (!this.mobile) {
+        Toast({
+          message: '请输入手机号',
+          duration: 1000,
+        })
+        return
+      }
+
+      // 使用正则表达式验证手机号
+      const phoneRegex = /^1[3456789]\d{9}$/
+      if (!phoneRegex.test(this.mobile)) {
+        console.log(this.mobile)
+        Toast({
+          message: '手机号码不正确',
+          duration: 1000,
+        })
+        return
+      }
+
+      if (!this.imgCode) {
+        Toast({
+          message: '请输入图像验证码',
+          duration: 1000,
+        })
+        return
+      }
+
+      await getSmsCode(this.mobile, this.imgCode, this.codeKey)
+      Toast({
+        message: '获取短信验证码成功',
+        duration: 1000,
       })
-      .catch((error) => {
-        console.error("请求验证码失败:", error);
-      });
+
+      let count = 5
+      this.$refs.smsCodeBtn.innerHTML = `${count}秒后重新获取`
+      const timer = setInterval(() => {
+        count--
+        this.$refs.smsCodeBtn.innerHTML = `${count}秒后重新获取`
+        this.$refs.smsCodeBtn.disabled = true
+        if (count <= 0) {
+          this.$refs.smsCodeBtn.innerHTML = '获取验证码'
+          this.$refs.smsCodeBtn.disabled = false
+          clearInterval(timer)
+        }
+      }, 1000)
+
+
+    }
   },
 };
 </script>
@@ -71,10 +118,12 @@ export default {
 
   .title {
     margin-bottom: 20px;
+
     h3 {
       font-size: 26px;
       font-weight: normal;
     }
+
     p {
       line-height: 40px;
       font-size: 14px;
@@ -88,6 +137,7 @@ export default {
     margin-bottom: 14px;
     display: flex;
     align-items: center;
+
     .inp {
       display: block;
       border: none;
@@ -96,10 +146,12 @@ export default {
       font-size: 14px;
       flex: 1;
     }
+
     img {
       width: 94px;
       height: 31px;
     }
+
     button {
       height: 31px;
       border: none;

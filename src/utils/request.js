@@ -1,4 +1,12 @@
-import store from '@/store'
+/*
+ * @Author: Li 776239423@qq.com
+ * @Date: 2025-12-10 09:41:18
+ * @LastEditors: Li 776239423@qq.com
+ * @LastEditTime: 2025-12-10 11:30:17
+ * @FilePath: \web-vue\src\utils\request.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
+
 import axios from 'axios'
 import { Toast } from 'vant'
 
@@ -14,19 +22,19 @@ const instance = axios.create({
 instance.interceptors.request.use(function (config) {
   // 在发送请求之前做些什么
   // 开启loading，禁止背景点击 (节流处理，防止多次无效触发)
-  Toast.loading({
-    message: '加载中...',
-    forbidClick: true, // 禁止背景点击
-    loadingType: 'spinner', // 配置loading图标
-    duration: 0 // 不会自动消失
-  })
+  // Toast.loading({
+  //   message: '加载中...',
+  //   forbidClick: true, // 禁止背景点击
+  //   loadingType: 'spinner', // 配置loading图标
+  //   duration: 0 // 不会自动消失
+  // })
 
-  // 只要有token，就在请求时携带，便于请求需要授权的接口
-  const token = store.getters.token
-  if (token) {
-    config.headers['Access-Token'] = token
-    config.headers.platform = 'H5'
-  }
+  // // 只要有token，就在请求时携带，便于请求需要授权的接口
+  // const token = store.getters.token
+  // if (token) {
+  //   config.headers['Access-Token'] = token
+  //   config.headers.platform = 'H5'
+  // }
 
   return config
 }, function (error) {
