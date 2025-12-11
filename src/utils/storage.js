@@ -8,6 +8,10 @@
 
 // 定义localStorage中的key
 const USER_INFO_KEY = 'hm_shopping_userInfo'
+// 定义localStorage中的key
+const SEARCH_HISTORY_KEY = 'hm_shopping_searchHistory'
+
+
 
 export const getUserInfo = () => {
   // 从localStorage中获取用户信息
@@ -28,4 +32,21 @@ export const setUserInfo = (userInfo) => {
 export const removeUserInfo = () => {
   // 从localStorage中移除用户信息
   localStorage.removeItem(USER_INFO_KEY)
+}
+
+
+export const setSearchHistory = (searchHistory) => {
+  // 将搜索历史转换为字符串并保存到localStorage中
+  localStorage.setItem(SEARCH_HISTORY_KEY, JSON.stringify(searchHistory))
+}
+
+export const getSearchHistory = () => {
+  // 从localStorage中获取搜索历史
+  const searchHistory = localStorage.getItem(SEARCH_HISTORY_KEY)
+  // 如果存在搜索历史，将其转换为数组并返回
+  if (searchHistory) {
+    return JSON.parse(searchHistory)
+  }
+  // 如果不存在搜索历史，返回空数组
+  return []
 }

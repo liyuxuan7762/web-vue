@@ -62,7 +62,7 @@ const router = new VueRouter({
       component: SearchList
     },
     {
-      path: '/prodetail/:id',
+      path: '/prodetail/:goodsId',
       component: ProDetail
     },
     {
