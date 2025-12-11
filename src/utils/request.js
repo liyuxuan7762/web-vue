@@ -9,6 +9,7 @@
 
 import axios from 'axios'
 import { Toast } from 'vant'
+import { getToken } from '@/utils/utils'
 
 // 创建 axios 实例，将来对创建出来的实例，进行自定义配置
 // 好处：不会污染原始的 axios 实例
@@ -28,12 +29,12 @@ instance.interceptors.request.use(function (config) {
     duration: 0 // 不会自动消失
   })
 
-  // // 只要有token，就在请求时携带，便于请求需要授权的接口
-  // const token = store.getters.token
-  // if (token) {
-  //   config.headers['Access-Token'] = token
-  //   config.headers.platform = 'H5'
-  // }
+  // 只要有token，就在请求时携带，便于请求需要授权的接口
+  const token = getToken()
+  if (token) {
+    config.headers['Access-Token'] = token
+    config.headers.platform = 'H5'
+  }
 
   return config
 }, function (error) {

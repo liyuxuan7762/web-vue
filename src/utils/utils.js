@@ -7,6 +7,8 @@
 
 // 验证手机号是否合法
 import { Toast } from 'vant'
+import store from '@/store'
+
 export const verifyPhone = (mobile) => {
   if (!mobile) {
     Toast({
@@ -71,4 +73,16 @@ export const verifySmsCode = (smsCode) => {
   }
 
   return true
+}
+
+// 验证用户是否已经登录
+// 从vuex中获取用户登录状态
+export const verifyLogin = () => {
+  const token = store.state.user.userInfo.token
+  if (token) return true
+  return false
+}
+
+export const getToken = () => {
+  return store.state.user.userInfo.token
 }

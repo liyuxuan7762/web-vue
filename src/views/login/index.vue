@@ -137,8 +137,10 @@ export default {
         message: "登录成功",
         duration: 1000,
       });
-
-      this.$router.push("/home");
+      // 登录成功后，判断是否有redirect参数
+      const redirect = this.$route.query.redirect || "/home";
+      // 登录成功后，跳转到redirect页面
+      this.$router.replace(redirect);
 
       // 登录成功后，保存用户信息
       this.setUserInfo({ userId, token });

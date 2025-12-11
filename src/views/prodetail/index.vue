@@ -1,6 +1,11 @@
 <template>
   <div class="prodetail">
-    <van-nav-bar fixed title="商品详情页" left-arrow @click-left="$router.go(-1)" />
+    <van-nav-bar
+      fixed
+      title="商品详情页"
+      left-arrow
+      @click-left="$router.go(-1)"
+    />
 
     <van-swipe :autoplay="3000" @change="onChange">
       <van-swipe-item v-for="(image, index) in images" :key="index">
@@ -8,7 +13,9 @@
       </van-swipe-item>
 
       <template #indicator>
-        <div class="custom-indicator">{{ current + 1 }} / {{ images.length }}</div>
+        <div class="custom-indicator">
+          {{ current + 1 }} / {{ images.length }}
+        </div>
       </template>
     </van-swipe>
 
@@ -40,14 +47,24 @@
     <div class="comment">
       <div class="comment-title">
         <div class="left">商品评价 ({{ totalComment }}条)</div>
-        <div class="right">查看更多 <van-icon name="arrow" /> </div>
+        <div class="right">查看更多 <van-icon name="arrow" /></div>
       </div>
       <div class="comment-list">
-        <div v-for="item in commentList" :key="item.comment_id" class="comment-item">
+        <div
+          v-for="item in commentList"
+          :key="item.comment_id"
+          class="comment-item"
+        >
           <div class="top">
-            <img :src="item.user.avatar_url || defaultAvatar" alt="">
+            <img :src="item.user.avatar_url || defaultAvatar" alt="" />
             <div class="name">{{ item.user.nick_name }}</div>
-            <van-rate :size="16" :value="item.score / 2" color="#ffd21e" void-icon="star" void-color="#eee"/>
+            <van-rate
+              :size="16"
+              :value="item.score / 2"
+              color="#ffd21e"
+              void-icon="star"
+              void-color="#eee"
+            />
           </div>
           <div class="content">
             {{ item.content }}
@@ -69,50 +86,165 @@
         <span>首页</span>
       </div>
       <div class="icon-cart">
-        <van-icon name="shopping-cart-o" />
+        <van-icon
+          name="shopping-cart-o"
+          :badge="totalCartQuantity > 0 ? totalCartQuantity : ''"
+        />
         <span>购物车</span>
       </div>
-      <div class="btn-add">加入购物车</div>
-      <div class="btn-buy">立刻购买</div>
+      <div class="btn-add" @click="addCart">加入购物车</div>
+      <van-action-sheet
+        v-model="show"
+        :title="mode === 'cart' ? '加入购物车' : '立刻购买'"
+      >
+        <div class="product">
+          <div class="product-title">
+            <div class="left">
+              <img :src="goodsDetail.goods_image" alt="" />
+            </div>
+            <div class="right">
+              <div class="price">
+                <span>¥</span>
+                <span class="nowprice">{{ goodsDetail.goods_price_min }}</span>
+                <span class="oldprice">{{ goodsDetail.goods_price_max }}</span>
+              </div>
+              <div class="count">
+                <span>库存</span>
+                <span>{{ goodsDetail.stock_total }}</span>
+              </div>
+            </div>
+          </div>
+          <div class="num-box">
+            <span>数量</span>
+            <van-stepper
+              v-model="quantity"
+              theme="round"
+              button-size="22"
+              disable-input
+            />
+          </div>
+          <div class="showbtn" v-if="goodsDetail.stock_total > 0">
+            <div @click="orderCart" class="btn" v-if="mode === 'cart'">
+              加入购物车
+            </div>
+            <div @click="orderNow" class="btn now" v-else>立刻购买</div>
+          </div>
+          <div class="btn-none" v-else>该商品已抢完</div>
+        </div>
+      </van-action-sheet>
+      <div class="btn-buy" @click="buyNow">立刻购买</div>
     </div>
   </div>
 </template>
 
 <script>
-import { getGoodDetail, getGoodRate } from '@/api/goods'
-import defaultAvatar from '@/assets/default-avatar.png'
+import { getGoodDetail, getGoodRate } from "@/api/goods";
+import defaultAvatar from "@/assets/default-avatar.png";
+import { verifyLogin } from "@/utils/utils";
+import { Dialog } from "vant";
+import { addToCart, getCartTotal } from "@/api/cart";
 export default {
-  name: 'ProDetailIndex',
-  data () {
+  name: "ProDetailIndex",
+  data() {
     return {
       images: [],
       current: 0,
       goodsDetail: {},
       totalComment: 0,
       commentList: [],
-      defaultAvatar: defaultAvatar
-    }
+      defaultAvatar: defaultAvatar,
+      show: false, // 控制购买弹窗显示,
+      mode: "cart",
+      quantity: 1,
+      totalCartQuantity: 0,
+    };
   },
   methods: {
-    onChange (index) {
-      this.current = index
-    }
+    onChange(index) {
+      this.current = index;
+    },
+    // 加入购物车
+    addCart() {
+      this.show = true;
+      this.mode = "cart";
+    },
+    // 立刻购买
+    buyNow() {
+      this.show = true;
+      this.mode = "buy";
+    },
+
+    // 加入购物车
+    async orderCart() {
+      if (!verifyLogin()) {
+        Dialog.alert({
+          title: "请登录",
+          message: "你还没有登录请先登录",
+          showConfirmButton: true,
+          showCancelButton: true,
+          confirmButtonText: "去登录",
+          cancelButtonText: "再逛逛",
+        })
+          .then(() => {
+            this.$router.replace({
+              path: "/login",
+              query: {
+                redirect: this.$route.fullPath,
+              },
+            });
+          })
+          .catch(() => {});
+      }
+
+      const {
+        data: { cartTotal },
+      } = await addToCart({
+        goodsId: this.goodsDetail.goods_id,
+        goodsNum: this.quantity,
+        goodsSkuId: this.goodsDetail.skuList[0].goods_sku_id,
+      });
+
+      this.totalCartQuantity = cartTotal;
+
+      this.$toast({
+        message: "加入购物车成功",
+        duration: 1000,
+      });
+
+      this.show = false;
+    },
+    orderNow() {
+      this.$toast({
+        message: "立刻购买成功",
+        duration: 1000,
+      });
+    },
   },
   async created() {
+    const goodsId = this.$route.params.goodsId;
 
-    const goodsId = this.$route.params.goodsId
-
-    const { data: {detail}} = await getGoodDetail(goodsId)
-    this.goodsDetail = detail
+    const {
+      data: { detail },
+    } = await getGoodDetail(goodsId);
+    this.goodsDetail = detail;
     // 把external_url属性提取出来，封装成新的数组
-    this.images = detail.goods_images.map(item => item.external_url)
+    this.images = detail.goods_images.map((item) => item.external_url);
 
-    const { data: {list, total}} = await getGoodRate({goodsId, limit: 3})
-    this.totalComment = total
-    this.commentList = list
-    console.log(this.commentList)
-  }
-}
+    const {
+      data: { list, total },
+    } = await getGoodRate({ goodsId, limit: 3 });
+    this.totalComment = total;
+    this.commentList = list;
+
+    if (verifyLogin()) {
+      // 获取购物车商品总数量
+      const {
+        data: { cartTotal },
+      } = await getCartTotal();
+      this.totalCartQuantity = cartTotal;
+    }
+  },
+};
 </script>
 
 <style lang="less" scoped>
@@ -139,7 +271,7 @@ export default {
     overflow: scroll;
     ::v-deep img {
       display: block;
-      width: 100%!important;
+      width: 100% !important;
     }
   }
   .info {
@@ -231,7 +363,8 @@ export default {
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    .icon-home, .icon-cart {
+    .icon-home,
+    .icon-cart {
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -260,5 +393,54 @@ export default {
 
 .tips {
   padding: 10px;
+}
+
+.product {
+  .product-title {
+    display: flex;
+    .left {
+      img {
+        width: 90px;
+        height: 90px;
+      }
+      margin: 10px;
+    }
+    .right {
+      flex: 1;
+      padding: 10px;
+      .price {
+        font-size: 14px;
+        color: #fe560a;
+        .nowprice {
+          font-size: 24px;
+          margin: 0 5px;
+        }
+      }
+    }
+  }
+
+  .num-box {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    align-items: center;
+  }
+
+  .btn,
+  .btn-none {
+    height: 40px;
+    line-height: 40px;
+    margin: 20px;
+    border-radius: 20px;
+    text-align: center;
+    color: rgb(255, 255, 255);
+    background-color: rgb(255, 148, 2);
+  }
+  .btn.now {
+    background-color: #fe5630;
+  }
+  .btn-none {
+    background-color: #cccccc;
+  }
 }
 </style>
