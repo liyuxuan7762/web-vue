@@ -2,7 +2,7 @@
  * @Author: Li 776239423@qq.com
  * @Date: 2025-12-10 09:41:18
  * @LastEditors: Li 776239423@qq.com
- * @LastEditTime: 2025-12-11 14:42:11
+ * @LastEditTime: 2025-12-12 11:50:21
  * @FilePath: \web-vue\src\utils\vant-ul.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -12,11 +12,12 @@
  * @Date         : 2025-12-09 20:01:20
  * @Description  : 全局注册vant组件
 */
-import { Dialog, Stepper, ActionSheet, Rate, Icon, GridItem, Search, Swipe, SwipeItem, Grid, Toast, Button, Tabbar, TabbarItem, NavBar } from 'vant';
+import { Checkbox, Dialog, Stepper, ActionSheet, Rate, Icon, GridItem, Search, Swipe, SwipeItem, Grid, Toast, Button, Tabbar, TabbarItem, NavBar } from 'vant';
 import Vue from 'vue';
 
 Vue.use(Dialog);
 Vue.use(Toast);
+Vue.use(Checkbox);
 Vue.use(ActionSheet);
 Vue.use(Rate);
 Vue.use(Icon);

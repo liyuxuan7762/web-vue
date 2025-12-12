@@ -29,3 +29,24 @@ export const getCartTotal = () => {
     },
   })
 }
+
+// 获取购物车中商品列表
+export const getCartList = () => {
+  return request.get('cart/list')
+}
+
+// 更新购物车商品数量
+export const updateCartQty = ({goodsId, goodsSkuId, goodsNum}) => {
+  return request({
+    url: 'cart/update',
+    method: 'post',
+    headers: {
+      platform: 'h5',
+    },
+    data: {
+      goodsId,
+      goodsSkuId,
+      goodsNum
+    }
+  })
+}

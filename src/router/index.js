@@ -76,7 +76,7 @@ const router = new VueRouter({
   ]
 })
 
-const authUrls = ['/pay', '/myorder']
+const authUrls = ['/pay', '/myorder', '/cart']
 
 router.beforeEach((to, from, next) => {
   // 检查URL是否需要登录才能访问
