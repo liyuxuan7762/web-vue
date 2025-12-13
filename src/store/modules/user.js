@@ -15,9 +15,7 @@ const getters = {}
 const mutations = {
   // 登录成功后，保存用户信息
   setUserInfo(state, payload) {
-    state.userInfo.userId = payload.userId
-    state.userInfo.token = payload.token
-
+    state.userInfo = payload
     // 同时保存到localStorage中
     setUserInfo(payload)
   },

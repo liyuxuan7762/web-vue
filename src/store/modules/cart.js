@@ -1,4 +1,4 @@
-import {getCartList, updateCartQty} from '@/api/cart'
+import { getCartList, updateCartQty, deleteCartItem } from '@/api/cart'
 const state = {
 	cartList: []
 }
@@ -22,7 +22,7 @@ const mutations = {
 	},
 
 	updateQty(state, playload) {
-		const {goodsId, goodsSkuId, goodsNum} = playload
+		const { goodsId, goodsSkuId, goodsNum } = playload
 		const item = state.cartList.find(item => item.goods.goods_id === goodsId)
 		if (item) {
 			item.goods_num = goodsNum
@@ -43,25 +43,44 @@ const getters = {
 		return state.cartList.reduce((pre, cur) => {
 			return pre + (cur.selected ? cur.goods_num * cur.goods.goods_price_min : 0)
 		}, 0)
+	},
+
+	// 获取所有选中的item
+	selectedItems(state) {
+		return state.cartList.filter(item => item.selected)
+	},
+
+
+	// 检查购物车是否全选
+	isCheckAll(state) {
+		return state.cartList.every(item => item.selected)
 	}
+
 }
 
 const actions = {
-	async getCartList (state) {
-		const {data: {list}} = await getCartList()
+	async getCartList(state) {
+		const { data: { list } } = await getCartList()
 		state.commit('setCartList', list.map(item => ({ ...item, selected: true })))
 	},
 
 	async updateQty(state, payload) {
 		await updateCartQty(payload)
 		state.commit('updateQty', payload)
+	},
+
+	// 删除购物车商品
+	async deleteCartItem(state, payload) {
+		await deleteCartItem(payload)
+		// 调用getCartList获取最新购物车商品列表
+		await state.dispatch('getCartList')
 	}
 }
 
 export default {
-    namespaced: true,
-    state,
-    mutations,
-    getters,
-    actions
+	namespaced: true,
+	state,
+	mutations,
+	getters,
+	actions
 }

@@ -177,23 +177,7 @@ export default {
     // 加入购物车
     async orderCart() {
       if (!verifyLogin()) {
-        Dialog.alert({
-          title: "请登录",
-          message: "你还没有登录请先登录",
-          showConfirmButton: true,
-          showCancelButton: true,
-          confirmButtonText: "去登录",
-          cancelButtonText: "再逛逛",
-        })
-          .then(() => {
-            this.$router.replace({
-              path: "/login",
-              query: {
-                redirect: this.$route.fullPath,
-              },
-            });
-          })
-          .catch(() => {});
+        this.askToLoginPopup();
       }
 
       const {
@@ -214,10 +198,40 @@ export default {
       this.show = false;
     },
     orderNow() {
-      this.$toast({
-        message: "立刻购买成功",
-        duration: 1000,
+      if (!verifyLogin()) {
+        this.askToLoginPopup();
+        return;
+      }
+
+      this.$router.push({
+        path: "/pay",
+        query: {
+          mode: "buyNow",
+          goodsId: this.goodsDetail.goods_id,
+          goodsNum: this.quantity,
+          goodsSkuId: this.goodsDetail.skuList[0].goods_sku_id,
+        },
       });
+    },
+
+    askToLoginPopup() {
+      Dialog.alert({
+        title: "请登录",
+        message: "你还没有登录请先登录",
+        showConfirmButton: true,
+        showCancelButton: true,
+        confirmButtonText: "去登录",
+        cancelButtonText: "再逛逛",
+      })
+        .then(() => {
+          this.$router.replace({
+            path: "/login",
+            query: {
+              redirect: this.$route.fullPath,
+            },
+          });
+        })
+        .catch(() => {});
     },
   },
   async created() {

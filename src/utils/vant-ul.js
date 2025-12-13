@@ -12,9 +12,11 @@
  * @Date         : 2025-12-09 20:01:20
  * @Description  : 全局注册vant组件
 */
-import { Checkbox, Dialog, Stepper, ActionSheet, Rate, Icon, GridItem, Search, Swipe, SwipeItem, Grid, Toast, Button, Tabbar, TabbarItem, NavBar } from 'vant';
+import { Tab, Tabs, Checkbox, Dialog, Stepper, ActionSheet, Rate, Icon, GridItem, Search, Swipe, SwipeItem, Grid, Toast, Button, Tabbar, TabbarItem, NavBar } from 'vant';
 import Vue from 'vue';
 
+Vue.use(Tab);
+Vue.use(Tabs);
 Vue.use(Dialog);
 Vue.use(Toast);
 Vue.use(Checkbox);

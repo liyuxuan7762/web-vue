@@ -36,7 +36,7 @@ export const getCartList = () => {
 }
 
 // 更新购物车商品数量
-export const updateCartQty = ({goodsId, goodsSkuId, goodsNum}) => {
+export const updateCartQty = ({ goodsId, goodsSkuId, goodsNum }) => {
   return request({
     url: 'cart/update',
     method: 'post',
@@ -47,6 +47,17 @@ export const updateCartQty = ({goodsId, goodsSkuId, goodsNum}) => {
       goodsId,
       goodsSkuId,
       goodsNum
+    }
+  })
+}
+
+// 删除商品
+export const deleteCartItem = (cartIdList) => {
+  return request({
+    url: '/cart/clear',
+    method: 'post',
+    data: {
+      cartIdList
     }
   })
 }
